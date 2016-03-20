@@ -118,5 +118,5 @@ for currentCategory in sortedAllCategoriesInfo:
                                                                                               'quantity'] * 100.0)))))
     print('==============================================================================\n\n\n')
     """
-    print('\n\n')
+    print('\n \n')
 printOverallData()
