@@ -51,8 +51,8 @@ for category in allCategories:
         groupedItems[currentIndex].price = float(
             "{0:.1f}".format(float(groupedItems[currentIndex].price / groupedItems[currentIndex].quantity)))
 
-        if quantity != 0:
-            averagePrice = float("{0:.2f}".format(float(overallPrice / quantity)))
+    if quantity != 0:
+        averagePrice = float("{0:.2f}".format(float(overallPrice / quantity)))
         companyProfit = categoryPrice * quantity - overallPrice
         profitable = float("{0:.2f}".format(float(averagePrice / categoryPrice * 100.0)))
         chance = float("{0:.2f}".format(float(wins / quantity * 100.0)))
@@ -72,10 +72,10 @@ for category in allCategories:
         values['chance'] = chance
         values['items'] = groupedItems
 
-        allCategoriesInfo[allCategories[category].indexName] = values
+    allCategoriesInfo[allCategories[category].indexName] = values
 
-        sortedAllCategoriesInfo = sorted(allCategoriesInfo, key=lambda dict: allCategoriesInfo[dict]['profitable'],
-                                         reverse=True)
+sortedAllCategoriesInfo = sorted(allCategoriesInfo, key=lambda dict: allCategoriesInfo[dict]['profitable'],
+                                 reverse=True)
 
 
 def printOverallData():
