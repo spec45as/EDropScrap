@@ -4,6 +4,7 @@ fileLoader = FileLoader(None)
 allCategories = fileLoader.loadCategories()
 
 from MySql import MySqlManager
+
 mysqlManager = MySqlManager()
 allItems = mysqlManager.getAllItems()
 allUsers = mysqlManager.getAllUsers()
@@ -26,7 +27,7 @@ for category in allCategories:
     items = {}
     for item in allItems:
 
-        if (allItems[item].categoryName == category):
+        if allItems[item].categoryName == category:
             if allItems[item].price >= categoryPrice:
                 wins += allItems[item].quantity
             else:
