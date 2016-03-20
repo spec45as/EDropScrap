@@ -26,15 +26,33 @@ for category in allCategories:
     wins = 0
     items = {}
     for item in allItems:
-
         if allItems[item].categoryName == category:
+
             if allItems[item].price >= categoryPrice:
                 wins += allItems[item].quantity
             else:
                 looses += allItems[item].quantity
+
             quantity = quantity + allItems[item].quantity
-            items[allItems[item].indexName] = allItems[item]
+
+            items[allItems[item].owner + '_' + allItems[item].indexName] = allItems[item]
             overallPrice = overallPrice + allItems[item].price * allItems[item].quantity
+
+            groupedItems = {}
+            # for curItem in items:
+            #print(len(items))
+            """
+                currentIndex = items[curItem].indexName
+                if groupedItems.get(currentIndex, None) is None:
+                    groupedItems[currentIndex] = items[curItem]
+                else:
+                    groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + items[curItem].quantity
+                    groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
+            """
+            #for curItem in groupedItems:
+            #    groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + items[curItem].quantity
+            #    groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
+
 
     if quantity != 0:
         averagePrice = float("{0:.2f}".format(float(overallPrice / quantity)))
@@ -55,7 +73,7 @@ for category in allCategories:
         values['companyProfit'] = companyProfit
         values['profitable'] = profitable
         values['chance'] = chance
-        values['items'] = items
+        values['items'] = groupedItems
 
         allCategoriesInfo[allCategories[category].indexName] = values
 
@@ -83,6 +101,7 @@ for currentCategory in sortedAllCategoriesInfo:
     print('В сумме easydrop заработал на этом кейсе ' + str(currentCategoryDict['companyProfit']) + ' руб.')
     print('Окупаемость в этом кейсе: ' + str(currentCategoryDict['profitable']) + '%')
     print('Шанс на выпадение окупаемой вещи в этом кейсе: ' + str(currentCategoryDict['chance']) + '%')
+    """
     print('\nПодробная статистика:\n')
     print('{name: <50}   {count}     {price}    {chance}'.format(name='Название', count='Кол-во', price='Цена',
                                                                  chance='Шанс'))
@@ -98,5 +117,6 @@ for currentCategory in sortedAllCategoriesInfo:
                                                                                           currentCategoryDict[
                                                                                               'quantity'] * 100.0)))))
     print('==============================================================================\n\n\n')
-
+    """
+    print('\n\n')
 printOverallData()
