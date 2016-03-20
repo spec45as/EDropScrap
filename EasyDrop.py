@@ -105,7 +105,7 @@ def getAllWins(startPos=0):
     if allUsersCount is None:
         return -1
 
-    searchRange = 3000
+    searchRange = 5000
     randomStartPos = allUsersCount - searchRange + int(searchRange * random.random())
 
     if startPos == 0:
