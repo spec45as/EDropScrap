@@ -72,7 +72,7 @@ for category in allCategories:
         values['chance'] = chance
         values['items'] = groupedItems
 
-    allCategoriesInfo[allCategories[category].indexName] = values
+        allCategoriesInfo[allCategories[category].indexName] = values
 
 sortedAllCategoriesInfo = sorted(allCategoriesInfo, key=lambda dict: allCategoriesInfo[dict]['profitable'],
                                  reverse=True)
