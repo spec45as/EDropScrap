@@ -4,7 +4,7 @@ from glob import glob
 import json
 import time
 
-import portalocker
+#import portalocker
 
 from Category import Category
 from Item import Item
@@ -22,7 +22,7 @@ class FileLoader():
                 raise FileNotFoundError
             file = open(fileName)
             fileContent = file.read()
-            portalocker.lock(file, portalocker.LOCK_EX)
+            #portalocker.lock(file, portalocker.LOCK_EX)
             # print("[FileLoader] File loaded: " + fileName)
             file.close()
             return fileContent
