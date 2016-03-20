@@ -97,7 +97,7 @@ for currentCategory in sortedAllCategoriesInfo:
     print('Из них выйграло ' + str(currentCategoryDict['wins']) + ' раз')
     print('Проиграло ' + str(currentCategoryDict['looses']) + ' раз')
     print('Выпавшие вещи в этом кейсе стоят в среднем ' + str(currentCategoryDict['averagePrice']) + ' руб.')
-    # print('В сумме вещей в этом кейсе выпало на ' + str(currentCategoryDict['overallPrice']) + ' руб.')
+    print('В сумме вещей в этом кейсе выпало на ' + str(currentCategoryDict['overallPrice']) + ' руб.')
     print('В сумме easydrop заработал на этом кейсе ' + str(currentCategoryDict['companyProfit']) + ' руб.')
     print('Окупаемость в этом кейсе: ' + str(currentCategoryDict['profitable']) + '%')
     print('Шанс на выпадение окупаемой вещи в этом кейсе: ' + str(currentCategoryDict['chance']) + '%')
