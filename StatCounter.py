@@ -101,7 +101,7 @@ for currentCategory in sortedAllCategoriesInfo:
     print('В сумме easydrop заработал на этом кейсе ' + str(currentCategoryDict['companyProfit']) + ' руб.')
     print('Окупаемость в этом кейсе: ' + str(currentCategoryDict['profitable']) + '%')
     print('Шанс на выпадение окупаемой вещи в этом кейсе: ' + str(currentCategoryDict['chance']) + '%')
-    """
+    '''
     print('\nПодробная статистика:\n')
     print('{name: <50}   {count}     {price}    {chance}'.format(name='Название', count='Кол-во', price='Цена',
                                                                  chance='Шанс'))
@@ -117,6 +117,6 @@ for currentCategory in sortedAllCategoriesInfo:
                                                                                           currentCategoryDict[
                                                                                               'quantity'] * 100.0)))))
     print('==============================================================================\n\n\n')
-    """
+    '''
     print('\n \n')
 printOverallData()
