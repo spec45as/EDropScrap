@@ -27,7 +27,6 @@ for category in allCategories:
     items = {}
     for item in allItems:
         if allItems[item].categoryName == category:
-
             if allItems[item].price >= categoryPrice:
                 wins += allItems[item].quantity
             else:
@@ -38,24 +37,22 @@ for category in allCategories:
             items[allItems[item].owner + '_' + allItems[item].indexName] = allItems[item]
             overallPrice = overallPrice + allItems[item].price * allItems[item].quantity
 
-            groupedItems = {}
-            # for curItem in items:
-            #print(len(items))
-            """
-                currentIndex = items[curItem].indexName
-                if groupedItems.get(currentIndex, None) is None:
-                    groupedItems[currentIndex] = items[curItem]
-                else:
-                    groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + items[curItem].quantity
-                    groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
-            """
-            #for curItem in groupedItems:
-            #    groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + items[curItem].quantity
-            #    groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
+    groupedItems = {}
+    for curItem in items:
+        currentIndex = items[curItem].indexName
+        if groupedItems.get(currentIndex, None) is None:
+            groupedItems[currentIndex] = items[curItem]
+        else:
+            groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + items[curItem].quantity
+            groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
 
+    for curItem in groupedItems:
+        currentIndex = groupedItems[curItem].indexName
+        groupedItems[currentIndex].price = float(
+            "{0:.1f}".format(float(groupedItems[currentIndex].price / groupedItems[currentIndex].quantity)))
 
-    if quantity != 0:
-        averagePrice = float("{0:.2f}".format(float(overallPrice / quantity)))
+        if quantity != 0:
+            averagePrice = float("{0:.2f}".format(float(overallPrice / quantity)))
         companyProfit = categoryPrice * quantity - overallPrice
         profitable = float("{0:.2f}".format(float(averagePrice / categoryPrice * 100.0)))
         chance = float("{0:.2f}".format(float(wins / quantity * 100.0)))
@@ -77,8 +74,8 @@ for category in allCategories:
 
         allCategoriesInfo[allCategories[category].indexName] = values
 
-sortedAllCategoriesInfo = sorted(allCategoriesInfo, key=lambda dict: allCategoriesInfo[dict]['profitable'],
-                                 reverse=True)
+        sortedAllCategoriesInfo = sorted(allCategoriesInfo, key=lambda dict: allCategoriesInfo[dict]['profitable'],
+                                         reverse=True)
 
 
 def printOverallData():
@@ -94,7 +91,7 @@ for currentCategory in sortedAllCategoriesInfo:
     print(currentCategoryDict['name'] + ' - Цена открытия: ' + str(currentCategoryDict['categoryPrice']) + ' руб.')
     print("Подробная информация о кейсе:")
     print('Этот кейс открыли как минимум ' + str(currentCategoryDict['quantity']) + ' раз')
-    print('Из них выйграло ' + str(currentCategoryDict['wins']) + ' раз')
+    print('Из них выиграло ' + str(currentCategoryDict['wins']) + ' раз')
     print('Проиграло ' + str(currentCategoryDict['looses']) + ' раз')
     print('Выпавшие вещи в этом кейсе стоят в среднем ' + str(currentCategoryDict['averagePrice']) + ' руб.')
     print('В сумме вещей в этом кейсе выпало на ' + str(currentCategoryDict['overallPrice']) + ' руб.')
@@ -102,7 +99,6 @@ for currentCategory in sortedAllCategoriesInfo:
     print('Окупаемость в этом кейсе: ' + str(currentCategoryDict['profitable']) + '%')
     print('Шанс на выпадение окупаемой вещи в этом кейсе: ' + str(currentCategoryDict['chance']) + '%')
 
-    '''
     print('\nПодробная статистика:\n')
     print('{name: <50}   {count}     {price}    {chance}'.format(name='Название', count='Кол-во', price='Цена',
                                                                  chance='Шанс'))
@@ -118,7 +114,5 @@ for currentCategory in sortedAllCategoriesInfo:
                                                                                           currentCategoryDict[
                                                                                               'quantity'] * 100.0)))))
     print('==============================================================================\n\n\n')
-    '''
 
-    print('\n \n')
 printOverallData()
