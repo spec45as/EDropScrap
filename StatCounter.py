@@ -2,7 +2,11 @@ from FileLoader import FileLoader
 
 fileLoader = FileLoader(None)
 allCategories = fileLoader.loadCategories()
-allItems = fileLoader.loadItems()
+#allItems = fileLoader.loadItems() old file shit
+from MySql import MySqlManager
+mysqlManager = MySqlManager()
+allItems = mysqlManager.getAllItems()
+
 allUsers = fileLoader.loadUsers()
 
 allCategoriesInfo = {}

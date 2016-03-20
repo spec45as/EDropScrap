@@ -11,7 +11,7 @@ class UsersContainer():
         self.save()
 
     def isUserChecked(self, userID):
-        return self.container.get(str(userID), False)
+        return self.container.get(userID, False)
 
     def save(self):
         data = {}

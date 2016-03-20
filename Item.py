@@ -33,8 +33,10 @@ class Item():
             imageFile.write(imageSource.content)
             imageFile.close()
 
+    def getIndexName(self):
+        return self.owner + '_' + self.indexName
 
-    def save(self):
+    def getJsonData(self):
         itemData = {}
 
         itemData['name'] = self.name
@@ -47,15 +49,19 @@ class Item():
         itemData['weaponIconURL'] = self.weaponIconURL
         itemData['lastUpdate'] = self.lastUpdate
         jsonDump = json.dumps(itemData)
+        return jsonDump
 
-        fileName = self.owner + '_' + self.indexName
+
+    def save(self):
+        jsonDump = self.getJsonData()
+
         try:
-            saveFile = open('items/{name}.txt'.format(name=fileName), 'w')
+            saveFile = open('items/{name}.txt'.format(name=self.getIndexName()), 'w')
             saveFile.write(jsonDump)
             saveFile.close()
             return True
         except:
-            print('[Item Class] Error during saving {name}!'.format(name=fileName))
+            print('[Item Class] Error during saving {name}!'.format(name=self.getIndexName()))
             return False
 
     def load(self, jsonData):
@@ -72,6 +78,5 @@ class Item():
 
             return True
         except:
-            fileName = self.owner + '_' + self.indexName
-            print('[Item Class] Error during loading {name}!'.format(name=fileName))
+            print('[Item Class] Error during loading {name}!'.format(name=self.getIndexName()))
             return False

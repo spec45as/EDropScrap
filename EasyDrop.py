@@ -7,7 +7,10 @@ from FileLoader import FileLoader
 from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedException
 from Category import Category
 from Item import Item
+from MySql import MySqlManager
 
+
+mysqlManager = MySqlManager()
 
 baseURL = 'http://www.easydrop.ru'
 
@@ -80,7 +83,6 @@ def findCategory(imageURL):
 
 
 def getUncheckedUser(rangeStart, rangeEnd):
-    allUsers = fileLoader.loadUsers()
     attempts = 3
 
     for attempt in range(1, attempts + 1):
@@ -91,6 +93,7 @@ def getUncheckedUser(rangeStart, rangeEnd):
             startPos = rangeStart
 
         for i in range(startPos, rangeEnd):
+            allUsers = mysqlManager.getAllUsers()
             if allUsers.container.get(i, None) is None:
                 return i
 
@@ -110,7 +113,7 @@ def getAllWins(startPos=0):
 
     for i in range(startPos, allUsersCount):
         allUsers = fileLoader.loadUsers()
-        if allUsers.isUserChecked(i) or (i == allUsersCount - 1):
+        if mysqlManager.getUser(i) or (i == (allUsersCount - 1)):
             uncheckedUser = getUncheckedUser(allUsersCount - searchRange, allUsersCount)
             if not uncheckedUser is None:
                 getAllWins(uncheckedUser)
@@ -131,7 +134,7 @@ def getAllWins(startPos=0):
             continue
         except NoItemsException as error:
             print('No Items!')
-            allUsers.saveUser(i)
+            mysqlManager.addUser(i)
             continue
 
         for currentDrop in allDrops:
@@ -149,7 +152,11 @@ def getAllWins(startPos=0):
                 categoryName = findCategory(caseIconURL)
                 owner = str(i)
 
-                itemObject = fileLoader.loadItem(owner + '_' + indexName + '_' + categoryName)
+                itemObject = mysqlManager.getItem(owner + '_' + indexName + '_' + categoryName)
+
+                # itemObject = fileLoader.loadItem(owner + '_' + indexName + '_' + categoryName)
+                # old file shit
+
                 if itemObject is None:
                     try:
                         newItem = Item(name)
@@ -159,9 +166,11 @@ def getAllWins(startPos=0):
                         newItem.categoryName = categoryName
                         newItem.indexName = indexName + "_" + categoryName
                         newItem.owner = owner
-                        newItem.save()
-                        newItem.downloadIcon()
-                        allUsers.saveUser(i)
+                        # newItem.save()
+                        # old file shit
+                        mysqlManager.addItem(newItem.getIndexName(), newItem.getJsonData())
+                        # newItem.downloadIcon()
+
                     except:
                         print('Error during creating of new Item')
                 else:
@@ -169,10 +178,14 @@ def getAllWins(startPos=0):
                     if itemObject.price != price:
                         if int(itemObject.price) > int(price):
                             itemObject.price = price
-                    itemObject.save()
-                    allUsers.saveUser(i)
+                    mysqlManager.updateItem(newItem.getIndexName(), newItem.getJsonData())
+                    # itemObject.save()
+                    # old file shit
             except:
                 print('Item parsing error')
+
+        mysqlManager.addUser(i)
+
 
     seleniumLoader.quit()
 
