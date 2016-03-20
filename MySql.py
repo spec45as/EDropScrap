@@ -15,12 +15,14 @@ database = 'id222383009-0_easydr'
 
 class MySqlManager():
     def __init__(self):
+        print('[Mysql] Init')
         self.connection = pymysql.connect(host=host,
                                           user=user,
                                           password=password,
                                           db=database,
                                           charset='utf8mb4',
                                           cursorclass=pymysql.cursors.DictCursor)
+
 
     def addItem(self, itemIndex, itemJson):
         try:

@@ -12,9 +12,8 @@ from UsersContainer import UsersContainer
 
 
 class FileLoader():
-    def __init__(self, mainApp):
-        self.mainApp = mainApp
-        # print("[File Loader] Init")
+    def __init__(self):
+        print("[File Loader] Init")
 
     def loadFile(self, fileName, attempt=0):
         try:
