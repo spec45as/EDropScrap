@@ -100,12 +100,12 @@ for currentCategory in sortedAllCategoriesInfo:
     print('Шанс на выпадение окупаемой вещи в этом кейсе: ' + str(currentCategoryDict['chance']) + '%')
 
     print('\nПодробная статистика:\n')
-    print('{name: <50}   {count}     {price}    {chance}'.format(name='Название', count='Кол-во', price='Цена',
+    print('{name: <50}   {count}     {price}      {chance}'.format(name='Название', count='Кол-во', price='Цена',
                                                                  chance='Шанс'))
-    print('==============================================================================')
+    print('================================================================================')
     for itemIndex in currentCategoryDict['items']:
         curItem = currentCategoryDict['items'][itemIndex]
-        print('{name: <50} {count: >4} шт {price: >6} руб   {chance: >5}%'.format(name=curItem.name,
+        print('{name: <50} {count: >4} шт {price: >8} руб   {chance: >5}%'.format(name=curItem.name,
                                                                                   count=curItem.quantity,
                                                                                   price=curItem.price,
                                                                                   chance=float(
@@ -113,6 +113,6 @@ for currentCategory in sortedAllCategoriesInfo:
                                                                                           curItem.quantity /
                                                                                           currentCategoryDict[
                                                                                               'quantity'] * 100.0)))))
-    print('==============================================================================\n\n\n')
+    print('================================================================================\n\n\n')
 
 printOverallData()
