@@ -26,6 +26,7 @@ def printStats():
         looses = 0
         wins = 0
         items = {}
+
         for item in allItems:
             if allItems[item].categoryName == category:
                 if allItems[item].price >= categoryPrice:
@@ -40,7 +41,7 @@ def printStats():
 
         groupedItems = {}
         for curItem in items:
-            currentIndex = items[curItem].indexName
+            currentIndex = items[curItem].name
             if groupedItems.get(currentIndex, None) is None:
                 groupedItems[currentIndex] = items[curItem]
             else:
@@ -49,8 +50,8 @@ def printStats():
 
         for curItem in groupedItems:
             currentIndex = groupedItems[curItem].indexName
-            groupedItems[currentIndex].price = float(
-                "{0:.1f}".format(float(groupedItems[currentIndex].price / groupedItems[currentIndex].quantity)))
+            groupedItems[curItem].price = float(
+                "{0:.1f}".format(float(groupedItems[curItem].price / groupedItems[curItem].quantity)))
 
         if quantity != 0:
             averagePrice = float("{0:.2f}".format(float(overallPrice / quantity)))
@@ -106,7 +107,11 @@ def printStats():
         print('{name: <50}   {count}     {price}      {chance}'.format(name='Название', count='Кол-во', price='Цена',
                                                                        chance='Шанс'))
         print('================================================================================')
-        for itemIndex in currentCategoryDict['items']:
+        sortedAllItems = sorted(currentCategoryDict['items'],
+                                key=lambda dict: currentCategoryDict['items'][dict].quantity / currentCategoryDict[
+                                    'quantity'], reverse=True)
+
+        for itemIndex in sortedAllItems:
             curItem = currentCategoryDict['items'][itemIndex]
             try:  # баги с кодировкой
                 print('{name: <50} {count: >4} шт {price: >8} руб   {chance: >5}%'.format(name=curItem.name,
@@ -123,5 +128,10 @@ def printStats():
 
     printOverallData()
     print('\n===================Конец вывода статистики===================\n')
+
+
+if __name__ == "__main__":
+    printStats()
+
 
 

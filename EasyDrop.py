@@ -8,6 +8,7 @@ from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedExcept
 from Category import Category
 from Item import Item
 from MySql import MySqlManager
+from StatCounter import printStats
 
 
 def createIndexStringFromHashName(string):
@@ -195,11 +196,11 @@ class DataCollector():
 def start():
     while True:
         print(
-            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных')  # \n2 - Вывести статистику')
+            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных\n2 - Вывести статистику')
         command = input("Введите число для дальнейших действий: ")
-        # if command == '2':
-        # print('Вывод статистики:')
-        #printStats()
+        if command == '2':
+            print('Вывод статистики:')
+            printStats()
         if command == '1':
             print('Сбор статистики')
             startDataCollection()
