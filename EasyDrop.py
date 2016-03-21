@@ -1,8 +1,9 @@
 import re
 import random
 
-from past.builtins import raw_input
 import unidecode
+
+from StatCounter import printStats
 
 from FileLoader import FileLoader
 from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedException
@@ -196,11 +197,11 @@ class DataCollector():
 def start():
     while True:
         print(
-            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных\n2 - Вывести статистику')
-        command = raw_input("Введите число для дальнейших действий: ")  # or `input("Some...` in python 3
-
+            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных')  # \n2 - Вывести статистику')
+        command = input("Введите число для дальнейших действий: ")
         if command == '2':
             print('Вывод статистики:')
+            printStats()
         elif command == '1':
             print('Сбор статистики')
             startDataCollection()
@@ -225,4 +226,5 @@ def startDataCollection():
                 print(error)
 
 
-start()
+if __name__ == "__main__":
+    start()
