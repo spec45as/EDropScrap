@@ -46,8 +46,8 @@ class Item():
         itemData['price'] = self.price
         itemData['owner'] = self.owner
         itemData['caseIconURL'] = self.caseIconURL
-        itemData['weaponIconURL'] = self.weaponIconURL
-        itemData['lastUpdate'] = self.lastUpdate
+        # itemData['weaponIconURL'] = self.weaponIconURL
+        #itemData['lastUpdate'] = self.lastUpdate
         jsonDump = json.dumps(itemData)
         return jsonDump
 
@@ -72,8 +72,8 @@ class Item():
             self.categoryName = jsonData['categoryName']
             self.price = jsonData['price']
             self.caseIconURL = jsonData['caseIconURL']
-            self.weaponIconURL = jsonData['weaponIconURL']
-            self.lastUpdate = jsonData['lastUpdate']
+            # self.weaponIconURL = jsonData['weaponIconURL']
+            #self.lastUpdate = jsonData['lastUpdate']
             self.owner = jsonData['owner']
 
             return True
