@@ -224,7 +224,7 @@ def start():
 
 
 def startDataCollection(categoryOnly=False):
-    attempt = 1
+    attempt = 0
     while True:
         attempt += 1
         print('Запуск сборщика данных, попытка: ' + str(attempt))
