@@ -12,29 +12,35 @@ class NoItemsException(LookupError):
 
 
 class SeleniumLoader():
-    def __init__(self):
+    def __init__(self, baseURL, isDota):
+        self.isDota = isDota
+        self.baseURL = baseURL
         self.driver = webdriver.PhantomJS()
         self.wait = WebDriverWait(self.driver, 12)
 
+
     def loadCategories(self):
         try:
-            self.driver.get("http://www.easydrop.ru/")
+            self.driver.get(self.baseURL)
 
             try:
-                self.wait.until(lambda driver: driver.find_element_by_class_name('collection'))
+                if self.isDota:
+                    self.wait.until(lambda driver: driver.find_element_by_class_name('item'))
+                else:
+                    self.wait.until(lambda driver: driver.find_element_by_class_name('collection'))
             except:
                 raise PageCouldntBeLoadedException()
 
             final = html.fragment_fromstring(self.driver.page_source, 'root')
             return final
         except:
-            print('I could not load the page')
+            print('I could not load category page')
             return None
 
 
     def loadCountURL(self):
         try:
-            self.driver.get("http://www.easydrop.ru/user/1")
+            self.driver.get(self.baseURL + "/user/1")
 
             try:
                 self.wait.until(lambda driver: driver.find_element_by_id('drops'))

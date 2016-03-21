@@ -6,21 +6,13 @@ from UsersContainer import UsersContainer
 from Category import Category
 from Item import Item
 
-
-# Just for tests, don't care guys
-user = '046440198_easydr'
-password = '046440198_easydr'
-host = 'mysql.id222383009-0.myjino.ru'
-database = 'id222383009-0_easydr'
-
-
 class MySqlManager():
-    def __init__(self):
+    def __init__(self, sqlConfig):
         print('[Mysql] Загрузка...')
-        self.connection = pymysql.connect(host=host,
-                                          user=user,
-                                          password=password,
-                                          db=database,
+        self.connection = pymysql.connect(host=sqlConfig['host'],
+                                          user=sqlConfig['user'],
+                                          password=sqlConfig['password'],
+                                          db=sqlConfig['database'],
                                           charset='utf8mb4',
                                           cursorclass=pymysql.cursors.DictCursor)
 

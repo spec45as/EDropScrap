@@ -15,11 +15,29 @@ def createIndexStringFromHashName(string):
 
 
 class DataCollector():
-    def __init__(self, range=5000):
+    def __init__(self, isDota, range=5000):
+        self.isDota = isDota
+        sqlConfig = {}
+        if self.isDota:
+            # Just for tests, don't care guys
+            sqlConfig['user'] = '046440198_dota'
+            sqlConfig['password'] = '046440198_dota'
+            sqlConfig['host'] = 'mysql.id222383009-0.myjino.ru'
+            sqlConfig['database'] = 'id222383009-0_dota'
+        else:
+            # Just for tests, don't care guys
+            sqlConfig['user'] = '046440198_easydr'
+            sqlConfig['password'] = '046440198_easydr'
+            sqlConfig['host'] = 'mysql.id222383009-0.myjino.ru'
+            sqlConfig['database'] = 'id222383009-0_easydr'
+
         self.range = range
-        self.mysqlManager = MySqlManager()
-        self.baseURL = 'http://www.easydrop.ru'
-        self.seleniumLoader = SeleniumLoader()
+        self.mysqlManager = MySqlManager(sqlConfig)
+        if self.isDota:
+            self.baseURL = 'http://dota2.easydrop.ru'
+        else:
+            self.baseURL = 'http://easydrop.ru'
+        self.seleniumLoader = SeleniumLoader(self.baseURL, self.isDota)
         self.allCategories = {}
 
 
@@ -36,7 +54,7 @@ class DataCollector():
             else:
                 print('Загрузка категорий дропов завершена')
                 return True
-
+        allSiteCategories = {}
         try:
             webPage = self.seleniumLoader.loadCategories()
             if webPage is None:
@@ -47,13 +65,15 @@ class DataCollector():
                 raise PageCouldntBeLoadedException()
         except PageCouldntBeLoadedException as error:
             print('Can\'t load main Page with categories')
+            return False
 
         for currentCategory in allSiteCategories:
             try:
                 indexName = currentCategory.get('href').split('/')
-                indexName = indexName[len(indexName) - 1]
+                indexName = createIndexStringFromHashName(indexName[len(indexName) - 1])
                 price = int(currentCategory.findtext('span'))
                 categoryObject = self.mysqlManager.getCategory(indexName)
+
                 if categoryObject is None:
                     try:
                         newCategory = Category(currentCategory.findtext('strong'))
@@ -66,10 +86,7 @@ class DataCollector():
                         self.mysqlManager.addCategory(newCategory.indexName, newCategory.getJsonData())
                     except:
                         print('Error during creating of new Category')
-                else:
-                    if categoryObject.price != price:
-                        categoryObject.price = price
-                        # categoryObject.save()
+
             except:
                 print('Error during category register')
                 continue
@@ -136,7 +153,7 @@ class DataCollector():
             try:
                 print('Progress: ' + str(i) + '/' + str(allUsersCount))
                 webPage = self.seleniumLoader.loadUserInventoryURL(
-                    'https://easydrop.ru/user/{user_id}'.format(user_id=i))
+                    self.baseURL + '/user/{user_id}'.format(user_id=i))
                 if webPage is None:
                     raise PageCouldntBeLoadedException()
                 webPage.make_links_absolute(self.baseURL)
@@ -155,27 +172,29 @@ class DataCollector():
                 try:
                     statusDiv = currentDrop.find_class('status')[0]
                     descDiv = currentDrop.find_class('descr')[0]
-                    dropImage = currentDrop.find_class('drop-image')[0]
+                    # dropImage = currentDrop.find_class('drop-image')[0]
                     caseImage = currentDrop.find_class('case-image')[0]
-
-                    name = descDiv.findtext('strong') + " | " + descDiv.findtext('span')
+                    if self.isDota:
+                        name = descDiv.findtext('strong')
+                    else:
+                        name = descDiv.findtext('strong') + " | " + descDiv.findtext('span')
                     indexName = createIndexStringFromHashName(str(name))
                     price = int(statusDiv.findall('span')[1].text)
-                    weaponIconURL = dropImage.get('src')
+                    # weaponIconURL = dropImage.get('src')
                     caseIconURL = caseImage.get('src')
                     categoryName = self.findCategory(caseIconURL)
+
+                    if categoryName == 'unknown':
+                        continue
                     owner = str(i)
 
                     itemObject = self.mysqlManager.getItem(owner + '_' + indexName + '_' + categoryName)
-
-                    # itemObject = fileLoader.loadItem(owner + '_' + indexName + '_' + categoryName)
-                    # old file shit
 
                     if itemObject is None:
                         try:
                             newItem = Item(name)
                             newItem.price = price
-                            newItem.weaponIconURL = weaponIconURL
+                            # newItem.weaponIconURL = weaponIconURL
                             newItem.caseIconURL = caseIconURL
                             newItem.categoryName = categoryName
                             newItem.indexName = indexName + "_" + categoryName
@@ -207,29 +226,40 @@ class DataCollector():
 
 def start():
     while True:
+        print('1 - Dota 2\n2 - CS:GO')
+        isDota = True
+        gameCommand = input("Введите число для дальнейших действий: ")
+        if gameCommand == '1':
+            isDota = True
+        elif gameCommand == '2':
+            isDota = False
+        else:
+            print('Неверная команда, попробуйте ещё раз')
+            continue
+
         print(
             'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных\n2 - Вывести статистику\n3 - Обновить категории')
         command = input("Введите число для дальнейших действий: ")
         if command == '2':
             print('<<Вывод статистики>>')
-            printStats()
-        if command == '1':
+            printStats(isDota)
+        elif command == '1':
             print('<<Сбор статистики>>')
-            startDataCollection()
-        if command == '3':
+            startDataCollection(False, isDota)
+        elif command == '3':
             print('<<Обновление категорий>>')
-            startDataCollection(True)
+            startDataCollection(True, isDota)
         else:
             print('Неверная команда, попробуйте ещё раз')
 
 
-def startDataCollection(categoryOnly=False):
+def startDataCollection(categoryOnly=False, isDota=False):
     attempt = 0
     while True:
         attempt += 1
         print('Запуск сборщика данных, попытка: ' + str(attempt))
         try:
-            dataLoader = DataCollector(50000)
+            dataLoader = DataCollector(isDota, 1000)
 
             if categoryOnly:
                 result = dataLoader.getAllCategories(True)

@@ -1,8 +1,22 @@
 from MySql import MySqlManager
 
 
-def printStats():
-    mysqlManager = MySqlManager()
+def printStats(isDota):
+    sqlConfig = {}
+    if isDota:
+        # Just for tests, don't care guys
+        sqlConfig['user'] = '046440198_dota'
+        sqlConfig['password'] = '046440198_dota'
+        sqlConfig['host'] = 'mysql.id222383009-0.myjino.ru'
+        sqlConfig['database'] = 'id222383009-0_dota'
+    else:
+        # Just for tests, don't care guys
+        sqlConfig['user'] = '046440198_easydr'
+        sqlConfig['password'] = '046440198_easydr'
+        sqlConfig['host'] = 'mysql.id222383009-0.myjino.ru'
+        sqlConfig['database'] = 'id222383009-0_easydr'
+
+    mysqlManager = MySqlManager(sqlConfig)
     allCategories = mysqlManager.getAllCategories()
     allItems = mysqlManager.getAllItems()
     allUsers = mysqlManager.getAllUsers()
@@ -128,7 +142,17 @@ def printStats():
 
 
 if __name__ == "__main__":
-    printStats()
+    while True:
+        print('1 - Dota 2\n2 - CS:GO')
+        gameCommand = input("Введите число для дальнейших действий: ")
+        if gameCommand == '1':
+            printStats(True)
+        elif gameCommand == '2':
+            printStats(False)
+        else:
+            print('Неверная команда, попробуйте ещё раз')
+            continue
+
 
 
 
