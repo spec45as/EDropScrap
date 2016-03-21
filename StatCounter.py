@@ -1,6 +1,6 @@
 from FileLoader import FileLoader
 
-fileLoader = FileLoader(None)
+fileLoader = FileLoader()
 allCategories = fileLoader.loadCategories()
 
 from MySql import MySqlManager
