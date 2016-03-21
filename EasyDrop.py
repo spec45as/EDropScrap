@@ -1,6 +1,7 @@
 import re
 import random
 
+from past.builtins import raw_input
 import unidecode
 
 from FileLoader import FileLoader
@@ -49,7 +50,7 @@ class DataCollector():
                         newCategory.price = price
                         newCategory.indexName = indexName
                         newCategory.save()
-                        newCategory.downloadIcon()
+                        # newCategory.downloadIcon()
 
                         self.allCategories[indexName] = newCategory
                     except:
@@ -192,17 +193,36 @@ class DataCollector():
         self.seleniumLoader.quit()
 
 
-attempt = 1
-while True:
-    print('Запуск сборщика данных, попытка: ' + str(attempt))
-    try:
-        dataLoader = DataCollector(10000)
-        dataLoader.getAllCategories()
-        dataLoader.getAllWins()
-    except Exception as error:
-        print(error)
-    finally:
+def start():
+    while True:
+        print(
+            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных\n2 - Вывести статистику')
+        command = raw_input("Введите число для дальнейших действий: ")  # or `input("Some...` in python 3
+
+        if command == '2':
+            print('Вывод статистики:')
+        elif command == '1':
+            print('Сбор статистики')
+            startDataCollection()
+        else:
+            print('Неверная команда, попробуйте ещё раз')
+
+
+def startDataCollection():
+    attempt = 1
+    while True:
+        print('Запуск сборщика данных, попытка: ' + str(attempt))
         try:
-            dataLoader.cleanup()
+            dataLoader = DataCollector(50000)
+            dataLoader.getAllCategories()
+            dataLoader.getAllWins()
         except Exception as error:
             print(error)
+        finally:
+            try:
+                dataLoader.cleanup()
+            except Exception as error:
+                print(error)
+
+
+start()

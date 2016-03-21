@@ -13,7 +13,7 @@ from UsersContainer import UsersContainer
 
 class FileLoader():
     def __init__(self):
-        print("[File Loader] Init")
+        print("[File Loader] Загрузка...")
 
     def loadFile(self, fileName, attempt=0):
         try:

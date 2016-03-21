@@ -84,6 +84,7 @@ def printOverallData():
     print('Общее количество посчитанных дропов ' + str(overallQuantity) + ' штук\n')
 
 
+print('\n===================Начало вывода статистики===================\n')
 printOverallData()
 
 for currentCategory in sortedAllCategoriesInfo:
@@ -101,7 +102,7 @@ for currentCategory in sortedAllCategoriesInfo:
 
     print('\nПодробная статистика:\n')
     print('{name: <50}   {count}     {price}      {chance}'.format(name='Название', count='Кол-во', price='Цена',
-                                                                 chance='Шанс'))
+                                                                   chance='Шанс'))
     print('================================================================================')
     for itemIndex in currentCategoryDict['items']:
         curItem = currentCategoryDict['items'][itemIndex]
@@ -116,3 +117,6 @@ for currentCategory in sortedAllCategoriesInfo:
     print('================================================================================\n\n\n')
 
 printOverallData()
+print('\n===================Конец вывода статистики===================\n')
+
+

@@ -15,7 +15,7 @@ database = 'id222383009-0_easydr'
 
 class MySqlManager():
     def __init__(self):
-        print('[Mysql] Init')
+        print('[Mysql] Загрузка...')
         self.connection = pymysql.connect(host=host,
                                           user=user,
                                           password=password,
