@@ -3,8 +3,6 @@ import random
 
 import unidecode
 
-from StatCounter import printStats
-
 from FileLoader import FileLoader
 from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedException
 from Category import Category
@@ -199,10 +197,10 @@ def start():
         print(
             'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных')  # \n2 - Вывести статистику')
         command = input("Введите число для дальнейших действий: ")
-        if command == '2':
-            print('Вывод статистики:')
-            printStats()
-        elif command == '1':
+        # if command == '2':
+        # print('Вывод статистики:')
+        #printStats()
+        if command == '1':
             print('Сбор статистики')
             startDataCollection()
         else:
