@@ -147,8 +147,10 @@ if __name__ == "__main__":
         gameCommand = input("Введите число для дальнейших действий: ")
         if gameCommand == '1':
             printStats(True)
+            break
         elif gameCommand == '2':
             printStats(False)
+            break
         else:
             print('Неверная команда, попробуйте ещё раз')
             continue
