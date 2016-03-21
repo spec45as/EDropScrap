@@ -3,7 +3,6 @@ import random
 
 import unidecode
 
-from FileLoader import FileLoader
 from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedException
 from Category import Category
 from Item import Item
@@ -19,12 +18,25 @@ class DataCollector():
     def __init__(self, range=5000):
         self.range = range
         self.mysqlManager = MySqlManager()
-        self.fileLoader = FileLoader()
         self.baseURL = 'http://www.easydrop.ru'
         self.seleniumLoader = SeleniumLoader()
-        self.allCategories = self.fileLoader.loadCategories()
+        self.allCategories = {}
 
-    def getAllCategories(self):
+
+    def getAllCategories(self, updateCategories=False):
+        if updateCategories:
+            print('Составление новых категорий дропов...')
+        else:
+            print('Загрузка категорий дропов...')
+
+        if not updateCategories:
+            self.allCategories = self.mysqlManager.getAllCategories()
+            if (self.allCategories is None) or (self.allCategories == {}):
+                raise Exception('Couldn\'t load item categories')
+            else:
+                print('Загрузка категорий дропов завершена')
+                return True
+
         try:
             webPage = self.seleniumLoader.loadCategories()
             if webPage is None:
@@ -41,7 +53,7 @@ class DataCollector():
                 indexName = currentCategory.get('href').split('/')
                 indexName = indexName[len(indexName) - 1]
                 price = int(currentCategory.findtext('span'))
-                categoryObject = self.allCategories.get(indexName, None)
+                categoryObject = self.mysqlManager.getCategory(indexName)
                 if categoryObject is None:
                     try:
                         newCategory = Category(currentCategory.findtext('strong'))
@@ -49,19 +61,20 @@ class DataCollector():
                         newCategory.marketURL = currentCategory.get('href')
                         newCategory.price = price
                         newCategory.indexName = indexName
-                        newCategory.save()
+                        # newCategory.save()
                         # newCategory.downloadIcon()
-
-                        self.allCategories[indexName] = newCategory
+                        self.mysqlManager.addCategory(newCategory.indexName, newCategory.getJsonData())
                     except:
                         print('Error during creating of new Category')
                 else:
                     if categoryObject.price != price:
                         categoryObject.price = price
-                        categoryObject.save()
+                        # categoryObject.save()
             except:
                 print('Error during category register')
                 continue
+
+        return self.getAllCategories(False)
 
 
     def getUserCount(self):
@@ -113,7 +126,6 @@ class DataCollector():
             startPos = randomStartPos
 
         for i in range(startPos, allUsersCount):
-            allUsers = self.fileLoader.loadUsers()
             if self.mysqlManager.getUser(i) or (i == (allUsersCount - 1)):
                 uncheckedUser = self.getUncheckedUser(allUsersCount - searchRange, allUsersCount)
                 if not uncheckedUser is None:
@@ -196,25 +208,37 @@ class DataCollector():
 def start():
     while True:
         print(
-            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных\n2 - Вывести статистику')
+            'Внимание! Перед началом необходимо получить доступ к базе данных!\n\n1 - Начать сбор данных\n2 - Вывести статистику\n3 - Обновить категории')
         command = input("Введите число для дальнейших действий: ")
         if command == '2':
-            print('Вывод статистики:')
+            print('<<Вывод статистики>>')
             printStats()
         if command == '1':
-            print('Сбор статистики')
+            print('<<Сбор статистики>>')
             startDataCollection()
+        if command == '3':
+            print('<<Обновление категорий>>')
+            startDataCollection(True)
         else:
             print('Неверная команда, попробуйте ещё раз')
 
 
-def startDataCollection():
+def startDataCollection(categoryOnly=False):
     attempt = 1
     while True:
+        attempt += 1
         print('Запуск сборщика данных, попытка: ' + str(attempt))
         try:
             dataLoader = DataCollector(50000)
-            dataLoader.getAllCategories()
+
+            if categoryOnly:
+                result = dataLoader.getAllCategories(True)
+                if result:
+                    return
+                else:
+                    continue
+
+            dataLoader.getAllCategories(False)
             dataLoader.getAllWins()
         except Exception as error:
             print(error)

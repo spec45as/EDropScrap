@@ -3,6 +3,7 @@ import json
 import pymysql.cursors
 
 from UsersContainer import UsersContainer
+from Category import Category
 from Item import Item
 
 
@@ -23,6 +24,61 @@ class MySqlManager():
                                           charset='utf8mb4',
                                           cursorclass=pymysql.cursors.DictCursor)
 
+    def addCategory(self, categoryIndex, categoryJson):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "INSERT INTO `categories` (`categoryIndex`, `jsonContent`) VALUES (%s, %s)"
+                cursor.execute(sql, (categoryIndex, categoryJson))
+
+            self.connection.commit()
+            return True
+        except Exception as error:
+            print(error)
+            return False
+
+    def getCategory(self, categoryIndex):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "SELECT `categoryIndex`, `jsonContent` FROM `categories` WHERE `categoryIndex`=%s"
+                cursor.execute(sql, (categoryIndex,))
+                result = cursor.fetchone()
+
+                if result is None:
+                    return None
+
+                jsonData = json.loads(result['jsonContent'])
+                category = Category()
+                category.load(jsonData)
+
+                return category
+
+        except Exception as error:
+            print(error)
+            return None
+
+    def getAllCategories(self):
+        allCategories = {}
+        try:
+            sql = "SELECT `categoryIndex`, `jsonContent` FROM `categories`"
+            cursor = self.connection.cursor()
+            cursor.execute(sql)
+            # print cur.description
+            # r = cur.fetchall()
+            # print r
+            # ...or...
+            for result in cursor:
+                jsonData = json.loads(result['jsonContent'])
+                category = Category()
+                category.load(jsonData)
+                allCategories[result['categoryIndex']] = category
+
+            cursor.close()
+
+            return allCategories
+
+        except Exception as error:
+            print(error)
+            return None
 
     def addItem(self, itemIndex, itemJson):
         try:

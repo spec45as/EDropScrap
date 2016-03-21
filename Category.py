@@ -30,6 +30,18 @@ class Category():
             imageFile.write(imageSource.content)
             imageFile.close()
 
+    def getJsonData(self):
+        itemData = {}
+        itemData['categoryName'] = self.categoryName
+        itemData['indexName'] = self.indexName
+        itemData['price'] = self.price
+        itemData['marketURL'] = self.marketURL
+        itemData['marketIconURL'] = self.marketIconURL
+        itemData['lastUpdate'] = self.lastUpdate
+        jsonDump = json.dumps(itemData)
+
+        return jsonDump
+
     def save(self):
         itemData = {}
         itemData['categoryName'] = self.categoryName

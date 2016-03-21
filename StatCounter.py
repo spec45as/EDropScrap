@@ -1,12 +1,9 @@
-from FileLoader import FileLoader
 from MySql import MySqlManager
 
 
 def printStats():
-    fileLoader = FileLoader()
-    allCategories = fileLoader.loadCategories()
-
     mysqlManager = MySqlManager()
+    allCategories = mysqlManager.getAllCategories()
     allItems = mysqlManager.getAllItems()
     allUsers = mysqlManager.getAllUsers()
 
