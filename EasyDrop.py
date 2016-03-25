@@ -5,7 +5,7 @@ import unidecode
 
 from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedException
 from Category import Category
-from Item import Item
+from Item import Item, generateIndexName
 from MySql import MySqlManager
 from StatCounter import printStats
 
@@ -81,8 +81,6 @@ class DataCollector():
                         newCategory.marketURL = currentCategory.get('href')
                         newCategory.price = price
                         newCategory.indexName = indexName
-                        # newCategory.save()
-                        # newCategory.downloadIcon()
                         self.mysqlManager.addCategory(newCategory.indexName, newCategory.getJsonData())
                     except:
                         print('Error during creating of new Category')
@@ -125,7 +123,7 @@ class DataCollector():
 
             for i in range(startPos, rangeEnd):
                 allUsers = self.mysqlManager.getAllUsers()
-                if allUsers.container.get(i, None) is None:
+                if allUsers.get(i, None) is None:
                     return i
 
         return None
@@ -142,8 +140,10 @@ class DataCollector():
         if startPos == 0:
             startPos = randomStartPos
 
-        for i in range(startPos, allUsersCount):
-            if self.mysqlManager.getUser(i) or (i == (allUsersCount - 1)):
+        startPos = 1
+        allUsersCount = 1
+        for i in range(startPos, allUsersCount + 1):
+            if self.mysqlManager.getUser(i):
                 uncheckedUser = self.getUncheckedUser(allUsersCount - searchRange, allUsersCount)
                 if not uncheckedUser is None:
                     self.getAllWins(uncheckedUser)
@@ -167,43 +167,37 @@ class DataCollector():
                 print('No Items!')
                 self.mysqlManager.addUser(i)
                 continue
-
+            try:
+                self.mysqlManager.addUser(i)
+            except:
+                print("Ошибка добавления нового игрока")
+                return 0
             for currentDrop in allDrops:
                 try:
                     statusDiv = currentDrop.find_class('status')[0]
                     descDiv = currentDrop.find_class('descr')[0]
-                    # dropImage = currentDrop.find_class('drop-image')[0]
                     caseImage = currentDrop.find_class('case-image')[0]
                     if self.isDota:
                         name = descDiv.findtext('strong')
                     else:
                         name = descDiv.findtext('strong') + " | " + descDiv.findtext('span')
-                    indexName = createIndexStringFromHashName(str(name))
                     price = int(statusDiv.findall('span')[1].text)
-                    # weaponIconURL = dropImage.get('src')
                     caseIconURL = caseImage.get('src')
-                    categoryName = self.findCategory(caseIconURL)
-
-                    if categoryName == 'unknown':
-                        continue
-                    owner = str(i)
-
-                    itemObject = self.mysqlManager.getItem(owner + '_' + indexName + '_' + categoryName)
+                    category = self.findCategory(caseIconURL)
+                    owner = i
+                    index = generateIndexName(name, owner, category)
+                    itemObject = self.mysqlManager.getItem(index)
 
                     if itemObject is None:
                         try:
-                            newItem = Item(name)
+                            newItem = Item()
+                            newItem.name = name
                             newItem.price = price
-                            # newItem.weaponIconURL = weaponIconURL
-                            newItem.caseIconURL = caseIconURL
-                            newItem.categoryName = categoryName
-                            newItem.indexName = indexName + "_" + categoryName
+                            newItem.category = category
+                            newItem.itemIndex = index
                             newItem.owner = owner
-                            # newItem.save()
-                            # old file shit
-                            self.mysqlManager.addItem(newItem.getIndexName(), newItem.getJsonData())
-                            # newItem.downloadIcon()
-
+                            newItem.setIndexName()
+                            self.mysqlManager.addItem(newItem)
                         except:
                             print('Error during creating of new Item')
                     else:
@@ -211,13 +205,11 @@ class DataCollector():
                         if itemObject.price != price:
                             if int(itemObject.price) > int(price):
                                 itemObject.price = price
-                        self.mysqlManager.updateItem(newItem.getIndexName(), newItem.getJsonData())
-                        # itemObject.save()
-                        # old file shit
+                        self.mysqlManager.addItem(itemObject)
                 except:
                     print('Item parsing error')
+                    return 0
 
-            self.mysqlManager.addUser(i)
 
     def cleanup(self):
         self.mysqlManager.close()
@@ -259,7 +251,7 @@ def startDataCollection(categoryOnly=False, isDota=False):
         attempt += 1
         print('Запуск сборщика данных, попытка: ' + str(attempt))
         try:
-            dataLoader = DataCollector(isDota, 1000)
+            dataLoader = DataCollector(isDota, 5000)
 
             if categoryOnly:
                 result = dataLoader.getAllCategories(True)

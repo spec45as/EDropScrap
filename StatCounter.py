@@ -39,7 +39,7 @@ def printStats(isDota):
         items = {}
 
         for item in allItems:
-            if allItems[item].categoryName == category:
+            if allItems[item].category == category:
                 if allItems[item].price >= categoryPrice:
                     wins += allItems[item].quantity
                 else:
@@ -47,7 +47,7 @@ def printStats(isDota):
 
                 quantity = quantity + allItems[item].quantity
 
-                items[allItems[item].owner + '_' + allItems[item].indexName] = allItems[item]
+                items[allItems[item].itemIndex] = allItems[item]
                 overallPrice = overallPrice + allItems[item].price * allItems[item].quantity
 
         groupedItems = {}
@@ -60,7 +60,7 @@ def printStats(isDota):
                 groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
 
         for curItem in groupedItems:
-            currentIndex = groupedItems[curItem].indexName
+            currentIndex = groupedItems[curItem].itemIndex
             groupedItems[curItem].price = float(
                 "{0:.1f}".format(float(groupedItems[curItem].price / groupedItems[curItem].quantity)))
 
@@ -93,7 +93,7 @@ def printStats(isDota):
 
     def printOverallData():
         print('\nИтоговая прибыль компании easydrop.ru составила ' + str(overallCompanyProfit) + ' руб')
-        print('Всего в базе ' + str(len(allUsers.container)) + ' игроков')
+        print('Всего в базе ' + str(len(allUsers)) + ' игроков')
         print('Общее количество посчитанных дропов ' + str(overallQuantity) + ' штук\n')
 
 

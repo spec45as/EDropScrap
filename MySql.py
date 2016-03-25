@@ -2,9 +2,9 @@ import json
 
 import pymysql.cursors
 
-from UsersContainer import UsersContainer
 from Category import Category
 from Item import Item
+
 
 class MySqlManager():
     def __init__(self, sqlConfig):
@@ -19,7 +19,7 @@ class MySqlManager():
     def addCategory(self, categoryIndex, categoryJson):
         try:
             with self.connection.cursor() as cursor:
-                sql = "INSERT INTO `categories` (`categoryIndex`, `jsonContent`) VALUES (%s, %s)"
+                sql = "INSERT INTO `categories_light` (`categoryIndex`, `jsonContent`) VALUES (%s, %s)"
                 cursor.execute(sql, (categoryIndex, categoryJson))
 
             self.connection.commit()
@@ -31,7 +31,7 @@ class MySqlManager():
     def getCategory(self, categoryIndex):
         try:
             with self.connection.cursor() as cursor:
-                sql = "SELECT `categoryIndex`, `jsonContent` FROM `categories` WHERE `categoryIndex`=%s"
+                sql = "SELECT `categoryIndex`, `jsonContent` FROM `categories_light` WHERE `categoryIndex`=%s"
                 cursor.execute(sql, (categoryIndex,))
                 result = cursor.fetchone()
 
@@ -51,13 +51,9 @@ class MySqlManager():
     def getAllCategories(self):
         allCategories = {}
         try:
-            sql = "SELECT `categoryIndex`, `jsonContent` FROM `categories`"
+            sql = "SELECT `categoryIndex`, `jsonContent` FROM `categories_light`"
             cursor = self.connection.cursor()
             cursor.execute(sql)
-            # print cur.description
-            # r = cur.fetchall()
-            # print r
-            # ...or...
             for result in cursor:
                 jsonData = json.loads(result['jsonContent'])
                 category = Category()
@@ -72,23 +68,15 @@ class MySqlManager():
             print(error)
             return None
 
-    def addItem(self, itemIndex, itemJson):
+    def addItem(self, item):
         try:
             with self.connection.cursor() as cursor:
-                sql = "INSERT INTO `items` (`itemIndex`, `jsonContent`) VALUES (%s, %s)"
-                cursor.execute(sql, (itemIndex, itemJson))
-
-            self.connection.commit()
-            return True
-        except Exception as error:
-            print(error)
-            return False
-
-    def updateItem(self, itemIndex, itemJson):
-        try:
-            with self.connection.cursor() as cursor:
-                sql = "UPDATE `items` SET jsonContent=%s WHERE itemIndex=%s"
-                cursor.execute(sql, (itemJson, itemIndex))
+                sql = "INSERT INTO `items_light` (`itemIndex`, `itemName`, `owner`, `category`, `price`, `quantity`)" \
+                      " VALUES (%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE `quantity` = %s, `price` = %s;"
+                cursor.execute(sql, (
+                    item.itemIndex, json.dumps(item.name), item.owner, item.category, item.price, item.quantity,
+                    item.quantity,
+                    item.price))
             self.connection.commit()
             return True
         except Exception as error:
@@ -98,9 +86,8 @@ class MySqlManager():
     def addUser(self, userID):
         try:
             with self.connection.cursor() as cursor:
-                sql = "INSERT INTO `users` (`userID`) VALUES (%s)"
+                sql = "INSERT INTO `users_light` (`userID`) VALUES (%s)"
                 cursor.execute(sql, (userID))
-
             self.connection.commit()
             return True
         except Exception as error:
@@ -110,13 +97,12 @@ class MySqlManager():
     def getUser(self, userID):
         try:
             with self.connection.cursor() as cursor:
-                sql = "SELECT `userID` FROM `users` WHERE `userID`=%s"
+                sql = "SELECT `userID` FROM `users_light` WHERE `userID`=%s"
                 cursor.execute(sql, (userID,))
                 result = cursor.fetchone()
 
                 if result is None:
                     return False
-
                 return True
 
         except Exception as error:
@@ -124,21 +110,15 @@ class MySqlManager():
             return None
 
     def getAllUsers(self):
-        allUsersContainer = UsersContainer()
-        allUsers = {}
+        allUsersContainer = {}
         try:
-            sql = "SELECT `userID` FROM `users`"
+            sql = "SELECT `userID` FROM `users_light`"
             cursor = self.connection.cursor()
             cursor.execute(sql)
-            # print cur.description
-            # r = cur.fetchall()
-            # print r
-            # ...or...
             for result in cursor:
-                allUsers[result['userID']] = True
+                allUsersContainer[result['userID']] = True
             cursor.close()
 
-            allUsersContainer.container = allUsers
             return allUsersContainer
 
         except Exception as error:
@@ -148,17 +128,18 @@ class MySqlManager():
     def getAllItems(self):
         allItems = {}
         try:
-            sql = "SELECT `itemIndex`, `jsonContent` FROM `items`"
+            sql = "SELECT `itemIndex`, `itemName`, `owner`, `category`, `price`, `quantity` FROM `items_light`"
             cursor = self.connection.cursor()
             cursor.execute(sql)
-            # print cur.description
-            # r = cur.fetchall()
-            # print r
-            # ...or...
             for result in cursor:
-                jsonData = json.loads(result['jsonContent'])
                 item = Item()
-                item.load(jsonData)
+                item.name = json.loads(result['itemName'])
+                item.owner = result['owner']
+                item.category = result['category']
+                item.price = result['price']
+                item.itemIndex = result['itemIndex']
+                item.quantity = result['quantity']
+
                 allItems[result['itemIndex']] = item
 
             cursor.close()
@@ -173,17 +154,20 @@ class MySqlManager():
     def getItem(self, itemIndex):
         try:
             with self.connection.cursor() as cursor:
-                sql = "SELECT `itemIndex`, `jsonContent` FROM `items` WHERE `itemIndex`=%s"
+                sql = "SELECT `itemIndex`, `itemName`, `owner`, `category`, `price`, `quantity` FROM `items_light` WHERE `itemIndex`=%s"
                 cursor.execute(sql, (itemIndex,))
                 result = cursor.fetchone()
 
                 if result is None:
                     return None
 
-                jsonData = json.loads(result['jsonContent'])
                 item = Item()
-                item.load(jsonData)
-
+                item.name = json.loads(result['itemName'])
+                item.owner = result['owner']
+                item.category = result['category']
+                item.price = result['price']
+                item.quantity = result['quantity']
+                item.itemIndex = result['itemIndex']
                 return item
 
         except Exception as error:
