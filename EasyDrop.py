@@ -140,8 +140,6 @@ class DataCollector():
         if startPos == 0:
             startPos = randomStartPos
 
-        startPos = 1
-        allUsersCount = 1
         for i in range(startPos, allUsersCount + 1):
             if self.mysqlManager.getUser(i):
                 uncheckedUser = self.getUncheckedUser(allUsersCount - searchRange, allUsersCount)
@@ -251,7 +249,7 @@ def startDataCollection(categoryOnly=False, isDota=False):
         attempt += 1
         print('Запуск сборщика данных, попытка: ' + str(attempt))
         try:
-            dataLoader = DataCollector(isDota, 5000)
+            dataLoader = DataCollector(isDota, 50000)
 
             if categoryOnly:
                 result = dataLoader.getAllCategories(True)
