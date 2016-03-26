@@ -1,3 +1,4 @@
+import hashlib
 import json
 
 import pymysql.cursors
@@ -71,10 +72,12 @@ class MySqlManager():
     def addItem(self, item):
         try:
             with self.connection.cursor() as cursor:
-                sql = "INSERT INTO `items_light` (`itemIndex`, `itemName`, `owner`, `category`, `price`, `quantity`)" \
-                      " VALUES (%s, %s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE `quantity` = %s, `price` = %s;"
+                nameMD5 = hashlib.md5()
+                nameMD5.update(json.dumps(item.name).encode())
+                sql = "INSERT INTO `items_light` (`nameMD5`, `owner`, `category`, `price`, `quantity`)" \
+                      " VALUES (%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE `quantity` = %s, `price` = %s;"
                 cursor.execute(sql, (
-                    item.itemIndex, json.dumps(item.name), item.owner, item.category, item.price, item.quantity,
+                    nameMD5.hexdigest(), item.owner, item.category, item.price, item.quantity,
                     item.quantity,
                     item.price))
             self.connection.commit()
@@ -82,6 +85,52 @@ class MySqlManager():
         except Exception as error:
             print(error)
             return False
+
+    def getItemName(self, nameMD5):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "SELECT `itemName` FROM `item_names_light` WHERE `nameMD5`=%s"
+                cursor.execute(sql, (nameMD5,))
+                result = cursor.fetchone()
+
+                if result is None:
+                    return None
+                return json.loads(result['itemName'])
+
+        except Exception as error:
+            print(error)
+            return None
+
+    def getAllItemNames(self):
+        allNames = {}
+        try:
+            sql = "SELECT `nameMD5`, `itemName` FROM `item_names_light`"
+            cursor = self.connection.cursor()
+            cursor.execute(sql)
+            for result in cursor:
+                allNames[result['nameMD5']] = json.loads(result['itemName'])
+            cursor.close()
+
+            return allNames
+
+        except Exception as error:
+            print(error)
+            return None
+
+    def addItemName(self, itemName):
+        try:
+            with self.connection.cursor() as cursor:
+                sql = "INSERT INTO `item_names_light` (`nameMD5`, `itemName`) VALUES (%s, %s) ON DUPLICATE KEY UPDATE `itemName` = %s"
+                jsonItemName = json.dumps(itemName)
+                nameMD5 = hashlib.md5()
+                nameMD5.update(jsonItemName.encode())
+                cursor.execute(sql, (nameMD5.hexdigest(), jsonItemName, jsonItemName))
+            self.connection.commit()
+            return True
+        except Exception as error:
+            print(error)
+            return False
+
 
     def addUser(self, userID):
         try:
@@ -127,20 +176,20 @@ class MySqlManager():
 
     def getAllItems(self):
         allItems = {}
+        allNames = self.getAllItemNames()
         try:
-            sql = "SELECT `itemIndex`, `itemName`, `owner`, `category`, `price`, `quantity` FROM `items_light`"
+            sql = "SELECT `nameMD5`, `owner`, `category`, `price`, `quantity` FROM `items_light`"
             cursor = self.connection.cursor()
             cursor.execute(sql)
             for result in cursor:
                 item = Item()
-                item.name = json.loads(result['itemName'])
+                item.name = allNames.get(result['nameMD5'], None)
                 item.owner = result['owner']
                 item.category = result['category']
                 item.price = result['price']
-                item.itemIndex = result['itemIndex']
                 item.quantity = result['quantity']
-
-                allItems[result['itemIndex']] = item
+                item.nameMD5 = result['nameMD5']
+                allItems[str(result['owner']) + '_' + result['nameMD5']] = item
 
             cursor.close()
 
@@ -151,23 +200,21 @@ class MySqlManager():
             return None
 
 
-    def getItem(self, itemIndex):
+    def getItem(self, nameMD5, owner, category):
         try:
             with self.connection.cursor() as cursor:
-                sql = "SELECT `itemIndex`, `itemName`, `owner`, `category`, `price`, `quantity` FROM `items_light` WHERE `itemIndex`=%s"
-                cursor.execute(sql, (itemIndex,))
+                sql = "SELECT `nameMD5`, `owner`, `category`, `price`, `quantity` FROM `items_light` WHERE `nameMD5`=%s AND `owner`=%s AND `category`=%s"
+                cursor.execute(sql, (nameMD5, owner, category,))
                 result = cursor.fetchone()
-
                 if result is None:
                     return None
 
                 item = Item()
-                item.name = json.loads(result['itemName'])
+                item.name = self.getItemName(result['nameMD5'])
                 item.owner = result['owner']
                 item.category = result['category']
                 item.price = result['price']
                 item.quantity = result['quantity']
-                item.itemIndex = result['itemIndex']
                 return item
 
         except Exception as error:

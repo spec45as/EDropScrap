@@ -36,7 +36,7 @@ def printStats(isDota):
         profitable = 0.0
         looses = 0
         wins = 0
-        items = {}
+        items = []
 
         for item in allItems:
             if allItems[item].category == category:
@@ -47,20 +47,19 @@ def printStats(isDota):
 
                 quantity = quantity + allItems[item].quantity
 
-                items[allItems[item].itemIndex] = allItems[item]
+                items.append(allItems[item])
                 overallPrice = overallPrice + allItems[item].price * allItems[item].quantity
 
         groupedItems = {}
         for curItem in items:
-            currentIndex = items[curItem].name
+            currentIndex = curItem.nameMD5
             if groupedItems.get(currentIndex, None) is None:
-                groupedItems[currentIndex] = items[curItem]
+                groupedItems[currentIndex] = curItem
             else:
-                groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + items[curItem].quantity
-                groupedItems[currentIndex].price = groupedItems[currentIndex].price + items[curItem].price
+                groupedItems[currentIndex].quantity = groupedItems[currentIndex].quantity + curItem.quantity
+                groupedItems[currentIndex].price = groupedItems[currentIndex].price + curItem.price
 
         for curItem in groupedItems:
-            currentIndex = groupedItems[curItem].itemIndex
             groupedItems[curItem].price = float(
                 "{0:.1f}".format(float(groupedItems[curItem].price / groupedItems[curItem].quantity)))
 

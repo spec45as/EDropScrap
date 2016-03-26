@@ -1,11 +1,14 @@
+import hashlib
+import json
 import re
 import random
+from time import time
 
 import unidecode
 
 from Selenium import SeleniumLoader, NoItemsException, PageCouldntBeLoadedException
 from Category import Category
-from Item import Item, generateIndexName
+from Item import Item
 from MySql import MySqlManager
 from StatCounter import printStats
 
@@ -148,8 +151,10 @@ class DataCollector():
                     return 0
                 else:
                     return 0
+            t0 = time()
             try:
-                print('Progress: ' + str(i) + '/' + str(allUsersCount))
+                print('\nProgress: ' + str(i) + '/' + str(allUsersCount), end="")
+
                 webPage = self.seleniumLoader.loadUserInventoryURL(
                     self.baseURL + '/user/{user_id}'.format(user_id=i))
                 if webPage is None:
@@ -162,14 +167,20 @@ class DataCollector():
                 print('Can\'t load user page URL')
                 continue
             except NoItemsException as error:
-                print('No Items!')
+                print(' [No Items]', end="")
                 self.mysqlManager.addUser(i)
                 continue
+            finally:
+                t1 = time()
+                print(' Загрузка страницы: {time}'.format(time=float("{0:.2f}".format(t1 - t0))) + ';', end="")
+
             try:
                 self.mysqlManager.addUser(i)
             except:
                 print("Ошибка добавления нового игрока")
                 return 0
+
+            t0 = time()
             for currentDrop in allDrops:
                 try:
                     statusDiv = currentDrop.find_class('status')[0]
@@ -183,8 +194,13 @@ class DataCollector():
                     caseIconURL = caseImage.get('src')
                     category = self.findCategory(caseIconURL)
                     owner = i
-                    index = generateIndexName(name, owner, category)
-                    itemObject = self.mysqlManager.getItem(index)
+
+                    nameMD5 = hashlib.md5()
+                    nameMD5.update(json.dumps(name).encode())
+                    itemObject = self.mysqlManager.getItem(nameMD5.hexdigest(), i, category)
+                    itemNameMD5 = self.mysqlManager.getItemName(nameMD5.hexdigest())
+                    if itemNameMD5 is None:
+                        self.mysqlManager.addItemName(name)
 
                     if itemObject is None:
                         try:
@@ -192,9 +208,7 @@ class DataCollector():
                             newItem.name = name
                             newItem.price = price
                             newItem.category = category
-                            newItem.itemIndex = index
                             newItem.owner = owner
-                            newItem.setIndexName()
                             self.mysqlManager.addItem(newItem)
                         except:
                             print('Error during creating of new Item')
@@ -207,6 +221,8 @@ class DataCollector():
                 except:
                     print('Item parsing error')
                     return 0
+            t1 = time()
+            print(' Обработка данных: {time}'.format(time=float("{0:.2f}".format(t1 - t0))), end="")
 
 
     def cleanup(self):

@@ -16,7 +16,8 @@ class SeleniumLoader():
         self.isDota = isDota
         self.baseURL = baseURL
         self.driver = webdriver.PhantomJS()
-        self.wait = WebDriverWait(self.driver, 12)
+        self.wait = WebDriverWait(self.driver, 10)
+        self.waitForItems = WebDriverWait(self.driver, 5)
 
 
     def loadCategories(self):
@@ -66,7 +67,7 @@ class SeleniumLoader():
         # print(self.driver.find_element_by_id('drops').find_elements_by_xpath(".//p")[0].text)
 
         try:
-            self.wait.until(lambda driver: driver.find_element_by_class_name('drop-image'))
+            self.waitForItems.until(lambda driver: driver.find_element_by_class_name('drop-image'))
         except:
             raise NoItemsException()
             return None
