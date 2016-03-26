@@ -102,6 +102,8 @@ def printStats(isDota):
 
     for currentCategory in sortedAllCategoriesInfo:
         currentCategoryDict = allCategoriesInfo[currentCategory]
+        if currentCategoryDict['quantity'] < 50:
+            continue
         print(currentCategoryDict['name'] + ' - Цена открытия: ' + str(currentCategoryDict['categoryPrice']) + ' руб.')
         print("Подробная информация о кейсе:")
         print('Этот кейс открыли как минимум ' + str(currentCategoryDict['quantity']) + ' раз')
@@ -128,7 +130,7 @@ def printStats(isDota):
                                                                                           count=curItem.quantity,
                                                                                           price=curItem.price,
                                                                                           chance=float(
-                                                                                              "{0:.2f}".format(float(
+                                                                                              "{0:.3f}".format(float(
                                                                                                   curItem.quantity /
                                                                                                   currentCategoryDict[
                                                                                                       'quantity'] * 100.0)))))
