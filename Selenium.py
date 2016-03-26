@@ -15,9 +15,10 @@ class SeleniumLoader():
     def __init__(self, baseURL, isDota):
         self.isDota = isDota
         self.baseURL = baseURL
+
         options = []
         # options.append('--proxy={}:{}'.format(host,port))
-        #options.append('--proxy-type=http')
+        # options.append('--proxy-type=http')
         options.append('--load-images=false')
         options.append('--disk-cache=true')
         self.driver = webdriver.PhantomJS(service_args=options)
