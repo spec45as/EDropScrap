@@ -22,7 +22,7 @@ class SeleniumLoader():
         options.append('--disk-cache=true')
         self.driver = webdriver.PhantomJS(service_args=options)
         self.wait = WebDriverWait(self.driver, 5)
-        self.waitForItems = WebDriverWait(self.driver, 5)
+        self.waitForItems = WebDriverWait(self.driver, 1)
 
 
     def loadCategories(self):
@@ -70,7 +70,6 @@ class SeleniumLoader():
             return None
 
         # print(self.driver.find_element_by_id('drops').find_elements_by_xpath(".//p")[0].text)
-
         try:
             self.waitForItems.until(lambda driver: driver.find_element_by_class_name('drop-image'))
         except:
