@@ -20,7 +20,7 @@ class SeleniumLoader():
         # options.append('--proxy={}:{}'.format(host,port))
         # options.append('--proxy-type=http')
         options.append('--load-images=false')
-        options.append('--disk-cache=true')
+        options.append('--disk-cache=false')
         self.driver = webdriver.PhantomJS(service_args=options)
         self.wait = WebDriverWait(self.driver, 5)
         self.waitForItems = WebDriverWait(self.driver, 1)

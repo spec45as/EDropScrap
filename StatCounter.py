@@ -102,8 +102,8 @@ def printStats(isDota):
 
     for currentCategory in sortedAllCategoriesInfo:
         currentCategoryDict = allCategoriesInfo[currentCategory]
-        if currentCategoryDict['quantity'] < 50:
-            continue
+        # №if currentCategoryDict['quantity'] < 50:
+        #   continue
         print(currentCategoryDict['name'] + ' - Цена открытия: ' + str(currentCategoryDict['categoryPrice']) + ' руб.')
         print("Подробная информация о кейсе:")
         print('Этот кейс открыли как минимум ' + str(currentCategoryDict['quantity']) + ' раз')
