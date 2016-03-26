@@ -265,7 +265,7 @@ def startDataCollection(categoryOnly=False, isDota=False):
         attempt += 1
         print('Запуск сборщика данных, попытка: ' + str(attempt))
         try:
-            dataLoader = DataCollector(isDota, 50000)
+            dataLoader = DataCollector(isDota, 100000)
 
             if categoryOnly:
                 result = dataLoader.getAllCategories(True)
